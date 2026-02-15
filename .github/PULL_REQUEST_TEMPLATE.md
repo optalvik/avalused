@@ -11,5 +11,5 @@
 
 ## Kontroll
 
-- [ ] Järgib [vormistuspoliitikat](docs/FORMATTING_POLICY_AV.md)
-- [ ] Ei muuda `site/` ega `mkdocs.yml` struktuuri
+- [ ] Muudan ainult `docs/` kaustas olevaid faile
+- [ ] Ei muuda `site/`, `mkdocs.yml` ega `overrides/` kausta
