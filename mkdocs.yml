@@ -1,0 +1,225 @@
+site_name: Arvutivõrkude alused
+site_description: Õppematerjalid arvutivõrkude põhialustest — OSI mudelist Cisco seadmete seadistamiseni
+site_author: Maria Talvik
+site_url: https://optalvik.github.io/avalused/
+
+repo_name: optalvik/avalused
+repo_url: https://github.com/optalvik/avalused
+edit_uri: edit/main/docs/
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# THEME
+# ═══════════════════════════════════════════════════════════════════════════════
+theme:
+  name: material
+  custom_dir: overrides
+  language: et
+
+  palette:
+    - scheme: default
+      primary: custom
+      accent: amber
+      toggle:
+        icon: material/brightness-7
+        name: Lülita tumedale režiimile
+    - scheme: slate
+      primary: custom
+      accent: amber
+      toggle:
+        icon: material/brightness-4
+        name: Lülita heledasse režiimi
+
+  font:
+    text: Inter
+    code: JetBrains Mono
+
+  logo: assets/logo.svg
+  favicon: assets/logo.svg
+  icon:
+    repo: fontawesome/brands/github
+    tag:
+      default: material/tag
+
+  features:
+    - navigation.instant
+    - navigation.instant.prefetch
+    - navigation.instant.progress
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.path
+    - navigation.top
+    - navigation.indexes
+    - toc.follow
+    - toc.integrate
+    - search.suggest
+    - search.highlight
+    - header.autohide
+    - content.code.copy
+    - content.code.select
+    - content.code.annotate
+    - content.tabs.link
+    - content.tooltips
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# PLUGINS
+# ═══════════════════════════════════════════════════════════════════════════════
+plugins:
+  - search:
+      lang: en
+      separator: '[\s\-,:!=\[\]()"/]+|(?!\b)(?=[A-Z][a-z])|\.(?!\d)|&[lg]t;'
+  - tags:
+      tags_file: tags.md
+  - offline
+  - glightbox:
+      touchNavigation: true
+      loop: true
+      effect: zoom
+      slide_effect: slide
+      width: 100%
+      height: auto
+      zoomable: true
+      draggable: true
+  - minify:
+      minify_html: true
+      minify_js: true
+      minify_css: true
+      htmlmin_opts:
+        remove_comments: true
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# MARKDOWN EXTENSIONS
+# ═══════════════════════════════════════════════════════════════════════════════
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+      auto_title: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets:
+      auto_append:
+        - includes/abbreviations.md
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.caret
+  - pymdownx.tilde
+  - pymdownx.smartsymbols
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - tables
+  - attr_list
+  - md_in_html
+  - def_list
+  - footnotes
+  - abbr
+  - toc:
+      permalink: true
+      permalink_title: Link sellele jaotisele
+      toc_depth: 3
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# EXTRA
+# ═══════════════════════════════════════════════════════════════════════════════
+extra:
+  tags:
+    Võrgud: vorgud
+    OSI: osi
+    TCP/IP: tcpip
+    IPv4: ipv4
+    Subnetting: subnet
+    Ruutimine: routing
+    Ethernet: ethernet
+    Praktikum: lab
+    CCNA: ccna
+    TLS: tls
+    PKI: pki
+    Sertifikaadid: certs
+    Turvalisus: security
+
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/optalvik
+      name: GitHub
+
+  generator: false
+
+extra_css:
+  - stylesheets/extra.css
+
+extra_javascript:
+  - javascripts/katex.js
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# COPYRIGHT
+# ═══════════════════════════════════════════════════════════════════════════════
+copyright: >
+  Copyright &copy; 2025 Maria Talvik -
+  <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# NAVIGATION
+# ═══════════════════════════════════════════════════════════════════════════════
+nav:
+  - Avaleht: index.md
+  - Õppematerjalide info: kursuse_info.md
+
+  - Õppematerjalid:
+    - teooria/index.md
+    - Põhitõed:
+      - Sissejuhatus:
+        - Miks võrgud?: teooria/00_sissejuhatus.md
+        - Võrguseadmed: teooria/00a_vorguseadmed.md
+        - Topoloogiad: teooria/00b_topoloogiad.md
+        - Võrgutüübid: teooria/00c_vorgutuubid.md
+      - Protokollid ja mudelid: teooria/01_protokollid_mudelid.md
+      - Füüsiline kiht: teooria/02_fuusiline_kiht.md
+      - Juhtmevabad võrgud: teooria/03_juhtmevabad_vorgud.md
+    - Võrgukihid:
+      - Andmesidekiht: teooria/04_andmesidekiht.md
+      - ARP: teooria/05_arp.md
+      - Võrgukiht: teooria/06_vorgukiht.md
+      - Transpordikiht: teooria/07_transpordikiht.md
+    - Adresseerimine:
+      - IPv4 adresseerimine: teooria/08_ipv4.md
+      - Kahendsüsteem: teooria/09_kahendaritmeetika.md
+      - Alamvõrgustamine: teooria/10_alamvorgustamine.md
+      - VLSM: teooria/11_vlsm.md
+    - Teenused ja marsruutimine:
+      - Marsruutimine: teooria/12_marsruutimine.md
+      - DHCP ja DNS: teooria/13_dhcp_dns.md
+      - Tõrkeotsing: teooria/14_torkeotsing.md
+
+  - Praktikumid:
+    - praktikumid/index.md
+    - "Praktikum 1: Packet Tracer": praktikumid/praktikum_01.md
+    - "Praktikum 2: CLI ja seadmete konfig": praktikumid/praktikum_02.md
+    - "Praktikum 3: Kommutaatori seadistamine": praktikumid/praktikum_03.md
+    - "Praktikum 4: Ruuteri seadistamine": praktikumid/praktikum_04.md
+    - "Praktikum 5: Täisseadistus": praktikumid/praktikum_05.md
+    - "Praktikum 6: Ethernet-kaabel": praktikumid/praktikum_06.md
+    - "Praktikum 7: MAC-aadresside tabel": praktikumid/praktikum_07.md
+    - "Praktikum 8: Ruuteri avastamine": praktikumid/praktikum_08.md
+    - "Praktikum 9: Staatiline marsruutimine": praktikumid/praktikum_09.md
+    - "Praktikum 10: Dünaamiline marsruutimine": praktikumid/praktikum_10.md
+    - "Praktikum 11: DHCP ja DNS": praktikumid/praktikum_11.md
+
+  - Sildid: tags.md

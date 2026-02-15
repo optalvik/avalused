@@ -1,0 +1,39 @@
+# Virtual environment
+.venv/
+venv/
+env/
+
+# MkDocs build output
+site/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.Python
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets
+.env
+*.key
+*.pem
+FORMATTING_POLICY.md
+
+# Source materials (not published, local only)
+Lecture/
+Labs/
+arvutivorkude_alused_plaan.md
+_source/
+
+# Archive (H5P etc)
+_arhiiv/
+IMAGE_NAMING_POLICY.md
