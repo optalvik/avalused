@@ -56,7 +56,7 @@ Kursus koosneb 16 teooriaosast ja 11 praktikumist.
 
 ## Veebileht
 
-[optalvik.github.io/av_alused](https://optalvik.github.io/av_alused/)
+[optalvik.github.io/avalused](https://optalvik.github.io/avalused/)
 
 ## Litsents
 
