@@ -64,6 +64,14 @@ Praktiline osa koosneb 11 laborist, mis kasutavad Cisco Packet Tracerit ja päri
 
     [:octicons-arrow-right-24: Alusta](praktikum_06.md)
 
+-   :material-switch:{ .lg .middle } **Praktikum 6b: MAC-tabel päris kommutaatoril**
+
+    ---
+
+    Sama MAC-tabel serveriruumi Cisco kommutaatoril, konsooli ja PuTTY-ga, grupitööna.
+
+    [:octicons-arrow-right-24: Alusta](praktikum_06b.md)
+
 -   :material-router:{ .lg .middle } **Praktikum 7: Ruuteri avastamine ja seadistamine**
 
     ---
