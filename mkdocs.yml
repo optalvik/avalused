@@ -216,7 +216,7 @@ nav:
     - "Praktikum 4: Ruuteri seadistamine ja DHCP": praktikumid/praktikum_04.md
     - "Praktikum 5: Ethernet-kaabli valmistamine": praktikumid/praktikum_05.md
     - "Praktikum 6: MAC-aadresside tabel": praktikumid/praktikum_06.md
-    - "Praktikum 6b: MAC-tabel päris kommutaatoril": praktikumid/praktikum_06b.md
+    - "Praktikum 6b: Andra Switch (päris kommutaator)": praktikumid/praktikum_06b.md
     - "Praktikum 7: Ruuteri avastamine ja seadistamine": praktikumid/praktikum_07.md
     - "Praktikum 8: Staatiline marsruutimine": praktikumid/praktikum_08.md
     - "Praktikum 9: Staatiline marsruutimine (iseseisev harjutus)": praktikumid/praktikum_09.md
