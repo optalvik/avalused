@@ -5,7 +5,7 @@ tags:
 
 # Praktikumid
 
-Praktiline osa koosneb 11 laborist, mis kasutavad Cisco Packet Tracerit ja päris võrguseadmeid.
+Praktiline osa koosneb 11 laborist, mis kasutavad Cisco Packet Tracerit ja serveriruumi võrguseadmeid.
 
 !!! tip "Soovitus"
     Tee praktikumid läbi järjekorras — igaüks ehitab eelmisele peale.
@@ -68,7 +68,7 @@ Praktiline osa koosneb 11 laborist, mis kasutavad Cisco Packet Tracerit ja päri
 
     ---
 
-    Päris kommutaator serveriruumis: konsoolikaabel, PuTTY, nimi ja paroolid. Grupitöö.
+    Cisco kommutaator serveriruumis: konsoolikaabel, PuTTY, nimi ja paroolid. Grupitöö.
 
     [:octicons-arrow-right-24: Alusta](praktikum_06b.md)
 

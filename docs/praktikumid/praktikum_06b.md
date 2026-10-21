@@ -4,16 +4,16 @@ tags:
   - Kommutaator
 ---
 
-# Praktikum 6b: Andra Switch — päris kommutaator serveriruumis
+# Praktikum 6b: Andra Switch — kommutaator serveriruumis
 
 Andra on uus IT-toe praktikant. Tema esimene ülesanne: serveriruumis on Cisco kommutaator, mille seadistust keegi ei tea. Andra peab ühendama oma arvuti kommutaatoriga, sisse logima ja seadistama selle nii, et kõik teaksid, mis seade see on, ja et suvaline inimene sinna sisse ei pääseks.
 
-Seni tegid seda Packet Traceris. Täna oled sina Andra ja teed sama **päris kommutaatoriga serveriruumis**.
+Seni tegid seda Packet Traceris. Täna oled sina Andra ja teed sama **serveriruumi Cisco kommutaatoriga**.
 
 !!! abstract "Eesmärgid"
     Selle praktikumi läbimise järel:
 
-    - Oskan ühendada arvuti päris kommutaatoriga konsoolikaabli ja PuTTY kaudu
+    - Oskan ühendada arvuti kommutaatoriga konsoolikaabli ja PuTTY kaudu
     - Oskan leida Windowsis COM-pordi numbri
     - Oskan seadistada kommutaatorile nime ja paroolid ning neid kontrollida
     - Oskan kommutaatori seadistuse kustutada (järgmise grupi jaoks)
@@ -140,6 +140,6 @@ Oma Classroomi repos brauseris:
 
 ## Kokkuvõte
 
-- Ühendusid päris kommutaatoriga konsooli kaudu, ilma IP-aadressita
+- Ühendusid kommutaatoriga konsooli kaudu, ilma IP-aadressita
 - Seadistasid nime, paroolid ja bänneri ning kontrollisid neid
 - Tegid kommutaatori järgmise grupi jaoks puhtaks
