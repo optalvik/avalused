@@ -1,272 +1,145 @@
 ---
 tags:
   - Praktikum
-  - Ethernet
+  - Kommutaator
 ---
 
-# Praktikum 6b: MAC-tabel päris kommutaatoril
+# Praktikum 6b: Andra Switch — päris kommutaator serveriruumis
 
-Praktikumis 6 nägid Packet Traceris, kuidas kommutaator MAC-aadresse õpib. Nüüd teed sama **päris kommutaatoriga serveriruumis**. Päris seade on teistsugune: pordid on füüsilised, kaablid tuleb ise õigesse kohta panna ja Windows ei vasta pingile enne, kui oled seda lubanud.
+Andra on uus IT-toe praktikant. Tema esimene ülesanne: serveriruumis on Cisco kommutaator, mille seadistust keegi ei tea. Andra peab ühendama oma arvuti kommutaatoriga, sisse logima ja seadistama selle nii, et kõik teaksid, mis seade see on, ja et suvaline inimene sinna sisse ei pääseks.
+
+Seni tegid seda Packet Traceris. Täna oled sina Andra ja teed sama **päris kommutaatoriga serveriruumis**.
 
 !!! abstract "Eesmärgid"
     Selle praktikumi läbimise järel:
 
-    - Oskan ühenduda päris kommutaatoriga konsoolikaabli ja PuTTY kaudu
-    - Oskan leida arvuti MAC-aadressi Windowsis (`ipconfig /all`)
-    - Oskan lugeda päris kommutaatori MAC-tabelit ja seostada iga rea konkreetse kaabli ja arvutiga
-    - Oskan selgitada, miks MAC-tabel täitub alles siis, kui arvutid midagi saadavad
-    - Oskan näidata `arp -a` abil, kuidas arvuti leiab IP-aadressi järgi MAC-aadressi
+    - Oskan ühendada arvuti päris kommutaatoriga konsoolikaabli ja PuTTY kaudu
+    - Oskan leida Windowsis COM-pordi numbri
+    - Oskan seadistada kommutaatorile nime ja paroolid ning neid kontrollida
+    - Oskan kommutaatori seadistuse kustutada (järgmise grupi jaoks)
 
-!!! warning "Eeldused"
-    - [Praktikum 6: MAC-aadresside tabel](praktikum_06.md) (Packet Tracer)
-    - [Peatükk 4: Andmesidekiht](../teooria/04_andmesidekiht.md)
-    - Konsooliühendus ja PuTTY (Serial, 9600): vaata enne [videot PuTTY ühendusest](https://drive.google.com/file/d/1y2phgdB0MZ0k9rTrmo_ES2ae5jxHEo1a/view?usp=sharing) ja [juhendit: klassi arvuti, konsoolikaabel, PuTTY](https://docs.google.com/document/d/12NH_-liylELLgUhspfoTXxHba21JFe0_eW3Jok0Zffk/edit?usp=sharing)
-
-!!! info "Mis kihil see on?"
-    Kommutaator on **2. kihi** (andmesidekiht, *Data Link*) seade: ta loeb kaadrist **MAC-aadressi** ja saadab kaadri õigesse porti. IP-aadressi ta ei vaata. IP-aadressidega töötab **ruuter**, mis on **3. kihi** (võrgukiht, *Network*) seade ja ühendab erinevaid võrke. Täna on PC-A ja PC-B samas võrgus (192.168.1.0/24), seega ruuterit pole vaja: kommutaatorist piisab.
-
-    Loe juurde: [OSI mudel, tabel 1.2](../teooria/01_protokollid_mudelid.md#osi-mudel), [Kommutaator — „tark postkontor“](../teooria/04_andmesidekiht.md#kommutaator-tark-postkontor), [Ruuter](../teooria/06_vorgukiht.md#ruuter-vorkude-vaheline-teejuht).
-
-!!! info "Vajalikud materjalid (ühe grupi kohta)"
-    - 1× Cisco kommutaator serveriruumis (number on valgel kleebisel)
-    - 1× konsoolikaabel + arvuti PuTTY-ga (**konsooliarvuti**)
-    - 2× arvutit või sülearvutit (**PC-A** ja **PC-B**)
-    - 2× Ethernet-kaablit (sobib ka praktikum 5 omatehtud kaabel)
+!!! warning "Enne tundi vaata"
+    - [Video: PuTTY ühendus](https://drive.google.com/file/d/1y2phgdB0MZ0k9rTrmo_ES2ae5jxHEo1a/view?usp=sharing)
+    - [Juhend: klassi arvuti, konsoolikaabel, PuTTY](https://docs.google.com/document/d/12NH_-liylELLgUhspfoTXxHba21JFe0_eW3Jok0Zffk/edit?usp=sharing)
+    - [Praktikum 2: CLI ja kommutaatori seadistamine](praktikum_02.md) (samad käsud Packet Traceris)
 
 !!! note "Grupitöö"
-    Grupis on 2–3 inimest. Jagage rollid ära ja vahetage Osa 4 juures:
+    Grupis on 2–3 inimest. Grupid töötavad korraga, igal grupil oma kommutaator. **Poole pealt vahetate rollid**, et igaüks trükiks ise käske.
 
-    | Roll | Mida teeb |
-    |---|---|
-    | Konsool | Istub PuTTY taga ja trükib kommutaatori käsud |
-    | PC-A / PC-B | Seadistab oma arvuti ja teeb pingi |
-    | Kirjutaja | Täidab tabelid (kui on 3 inimest) |
+    | Roll | Kus | Mida teeb |
+    |---|---|---|
+    | Serveriruum | serveriruumis, kapp K1 | ühendab kaabli patch-paneelilt kommutaatori CONSOLE porti, teeb foto `kaabel.jpg` |
+    | Konsool | klassis arvuti taga | PuTTY, trükib käsud |
+    | Kirjutaja (3. inimene) | klassis | teeb ekraanipildid `putty.png` ja `show-run.png`, märgib üles kommutaatori numbri |
 
-## Topoloogia
+    Esitab **igaüks** oma Classroomi repos ([Lab 06b - Andra Switch](https://classroom50.org/hkhk-avalused/it26-avalused/assignments)). Grupi pildid võivad olla samad, vastused kirjutab igaüks ise.
 
-```text
-   [Konsooliarvuti]
-          |  konsoolikaabel (CONSOLE port)
-          |
-   [ SW-xx kommutaator ]
-      |            |
-   port 1       port 2      Ethernet-kaablid
-      |            |
-   [PC-A]       [PC-B]
-   192.168.1.10 192.168.1.20  /24
-```
+**Parool on kõikjal `1234`.**
 
-*Joonis 6b.1. Grupi topoloogia*
-
-## Osa 1: Konsooliühendus ja puhas tabel
-
-### Samm 1: Logi sisse
-
-1. Ühenda konsoolikaabel kommutaatori **CONSOLE** porti.
-2. PuTTY: **Serial**, kiirus **9600**, COM-port vaata Device Managerist. Kuidas täpselt: [video](https://drive.google.com/file/d/1y2phgdB0MZ0k9rTrmo_ES2ae5jxHEo1a/view?usp=sharing), [juhend](https://docs.google.com/document/d/12NH_-liylELLgUhspfoTXxHba21JFe0_eW3Jok0Zffk/edit?usp=sharing).
-3. Vajuta Enter, kuni näed viipa `SW-xx>`.
+## Kuidas ühendus käib
 
 ```text
-SW-xx> enable
-Password: 1234
-SW-xx#
+Sinu arvuti ──(konsoolikaabel, USB → RJ-45)── laua pesa (nt 21.1)
+      … seina sees …
+Serveriruum, kapp K1: patch-paneeli pesa 21.1 ──(sinine kaabel)── kommutaatori CONSOLE port
 ```
 
-!!! tip "Kui PuTTY aken jääb mustaks"
-    Kontrolli COM-numbrit Device Manageris (**Ports (COM & LPT)**). Sageli on see COM3 või COM4, mitte COM1.
+*Joonis 6b.1. Konsooliühenduse tee klassist serveriruumi*
 
-### Samm 2: Tühjenda MAC-tabel
+**Konsoolikaabel** (helesinine) ei ole võrgukaabel. Selle kaudu räägid kommutaatoriga otse, ka siis, kui tal pole veel IP-aadressi.
 
-Enne teid võis keegi teine samu kaableid kasutada. Alusta puhtalt lehelt:
+!!! info "Mis seade see on?"
+    Kommutaator on **2. kihi** (andmesidekiht) seade: ta saadab kaadreid **MAC-aadressi** järgi õigesse porti. Seda nägid praktikumis 6. IP-aadressidega töötab **ruuter** (3. kiht, võrgukiht). Loe juurde: [OSI mudel](../teooria/01_protokollid_mudelid.md#osi-mudel), [Kommutaator](../teooria/04_andmesidekiht.md#kommutaator-tark-postkontor), [Ruuter](../teooria/06_vorgukiht.md#ruuter-vorkude-vaheline-teejuht).
+
+## Samm 1: Ühenda kaabel
+
+1. **Klassis:** konsoolikaabli USB-ots arvutisse, RJ-45 ots laua pessa. Kirjuta üles pesa number (nt 21.1).
+2. **Serveriruumis:** leia kapist **K1** patch-paneelilt sama number ja ühenda sinine kaabel sealt kommutaatori **CONSOLE** porti.
+
+Kommutaatori **SYST** tuluke põleb roheliselt. Kaabel peab olema katkematu: arvuti → sein → paneel → kommutaatori konsool.
+
+📷 **Tõend:** foto kommutaatorist, kus on näha konsoolikaabel CONSOLE pordis → `kaabel.jpg`
+
+!!! warning "Serveriruumis"
+    Puutu ainult oma grupi kommutaatorit ja sinist konsoolikaablit. Teisi kaableid ja seadmeid ära tõmba välja: nendest käib kooli võrk.
+
+## Samm 2: Leia COM-port
+
+Windowsis: paremklõps **Start** → **Device Manager** → **Ports (COM & LPT)**.
+
+Näed rida nagu `USB Serial Port (COM3)`. Number võib olla muu. PuTTY peab teadma, millise pordi kaudu kaabel arvutiga ühendatud on.
+
+## Samm 3: Ava PuTTY
+
+**Connection type:** Serial · **Serial line:** COM3 (sinu number) · **Speed:** 9600 · **Open**.
+
+Avaneb must aken, esialgu võib see olla tühi. Cisco konsool räägib kiirusega 9600 bitti sekundis. Vale kiiruse korral näed segast teksti või mitte midagi.
+
+📷 **Tõend:** ekraanipilt PuTTY seadetest enne **Open** vajutamist → `putty.png`
+
+## Samm 4: Ärata terminal
+
+Vajuta **Enter** paar korda. Näed `Switch>` või küsimust `Would you like to enter the initial configuration dialog? [yes/no]:`. Kui tuleb küsimus, kirjuta `no` ja Enter. Kui küsitakse parooli, kirjuta `1234`.
+
+!!! tip "Kui midagi ei tule"
+    - Kontrolli COM-numbrit (Device Manager) ja kiirust **9600**.
+    - Kas kaabel on serveriruumis **CONSOLE** pordis, mitte tavalises pordis?
+    - Kas laua pesa number ja paneeli number on samad?
+
+## Samm 5: Seadista kommutaator
+
+Kirjuta käsud ükshaaval. `XX` asemel kirjuta oma eesnimi.
 
 ```text
-SW-xx# clear mac address-table dynamic
-SW-xx# show mac address-table
+enable
+configure terminal
+hostname SW-XX
+enable secret 1234
+line console 0
+ password 1234
+ login
+ exit
+banner motd # Andra switch - ainult IT-26 #
+end
+show running-config
 ```
 
-Tabel peaks olema tühi (või seal on ainult `CPU` read, mis kuuluvad kommutaatorile endale).
+Prompt muutub: `SW-XX#`. `show running-config` näitab sinu hostname'i ja rida `enable secret 5 ...` (parool on krüpteeritud). Hostname näitab, millise seadmega töötad. Paroolid kaitsevad kommutaatorit.
 
-💭 **Mõtle:** Packet Traceris oli tabel kohe alguses tühi. Miks pidid siin selle ise tühjaks tegema?
+📷 **Tõend:** ekraanipilt `show running-config` algusest → `show-run.png`
 
-## Osa 2: Arvutite MAC-aadressid
+## Samm 6: Kontrolli paroole
 
-### Samm 1: Leia oma MAC
+Kirjuta `exit` ja vajuta Enter. Kommutaator küsib nüüd parooli: `1234`. Siis `enable` ja jälle `1234`.
 
-PC-A ja PC-B mõlemas avage **cmd** ja:
+💭 **Mõtle:** Kumb parool küsiti esimesena ja kumb pärast `enable`-it? Miks on vaja kahte?
+
+**Vahetage nüüd rollid** ja tehke sammud 4–6 uuesti oma nimega (`hostname SW-teine-nimi`).
+
+## Samm 7: Tee kommutaator puhtaks
+
+Järgmise grupi jaoks:
 
 ```text
-ipconfig /all
+enable
+write erase
+reload
 ```
 
-Leidke Etherneti adapteri (mitte Wi-Fi!) rida **Physical Address**.
+Kui küsitakse `Proceed with reload? [confirm]`, vajuta Enter. Kui küsitakse `Save? [yes/no]`, kirjuta `no`.
 
-| Arvuti | MAC Windowsis (`ipconfig /all`) | Kommutaatori port |
-|---|---|---|
-| PC-A | | |
-| PC-B | | |
+!!! tip "Kui unustasid parooli: MODE-nupp"
+    Kommutaatori esiküljel vasakul on nupp **MODE**. Hoia seda **15 sekundit** all, kuni tuled vilguvad oranžilt, ja lase lahti. Kommutaator kustutab seadistuse ja taaskäivitub. Alusta uuesti sammust 4.
 
-*Tabel 6b.1. Täida kohe MAC-veerg. Port tuleb hiljem.*
+## Esitamine
 
-!!! warning "Wi-Fi vs Ethernet"
-    Sülearvutil on mitu adapterit ja igaühel oma MAC. Wi-Fi MAC-i kommutaatori tabelist **ei leia**, sest Wi-Fi ei käi läbi selle kaabli.
+Oma Classroomi repos brauseris:
 
-## Osa 3: Ühenda, seadista IP, vaata tabelit
-
-### Samm 1: Ühenda ainult PC-A
-
-Ühenda PC-A kommutaatori porti 1. Oota, kuni pordi tuli muutub roheliseks (kuni 30 sekundit).
-
-```text
-SW-xx# show mac address-table
-```
-
-💭 **Mõtle:** Kas PC-A MAC ilmus tabelisse ilma, et oleksid midagi saatnud? Windows saadab ühendamisel ise mõned kaadrid (DHCP, teadaanded). Kas sinu tabelis on see näha?
-
-### Samm 2: Ühenda PC-B ja anna IP-aadressid
-
-Ühenda PC-B porti 2. Seadista mõlemale staatiline IP (**ncpa.cpl** → Etherneti adapter → IPv4):
-
-| Arvuti | IP-aadress | Mask |
-|---|---|---|
-| PC-A | 192.168.1.10 | 255.255.255.0 |
-| PC-B | 192.168.1.20 | 255.255.255.0 |
-
-*Tabel 6b.2. IP-aadressid*
-
-### Samm 3: Luba ping tulemüüris
-
-Windowsi tulemüür **ei vasta vaikimisi pingile**. Mõlemas arvutis avage cmd **administraatorina**:
-
-```text
-netsh advfirewall firewall add rule name="ICMP lubatud" protocol=icmpv4:8,any dir=in action=allow
-```
-
-### Samm 4: Ping ja tabel
-
-PC-A-st:
-
-```text
-ping 192.168.1.20
-```
-
-Kohe pärast seda konsoolis:
-
-```text
-SW-xx# show mac address-table
-```
-
-Näidis (sinu numbrid on teised):
-
-```text
-          Mac Address Table
--------------------------------------------
-Vlan    Mac Address       Type        Ports
-----    -----------       --------    -----
-   1    3c52.82a1.0f11    DYNAMIC     Fa0/1
-   1    3c52.82a1.77e4    DYNAMIC     Fa0/2
-```
-
-Täida nüüd tabelis 6b.1 veerg **Kommutaatori port**.
-
-!!! tip "MAC-aadress näeb teistsugune välja"
-    Windows kirjutab `3C-52-82-A1-0F-11`, Cisco aga `3c52.82a1.0f11`. See on **sama aadress**, ainult teises kirjaviisis. Võrdle numbreid ja tähti, mitte kriipse ega punkte.
-
-!!! warning "Kui ping ei vasta"
-    | Näed | Kontrolli |
-    |---|---|
-    | `Request timed out` | Kas tulemüüri reegel lisati mõlemas arvutis? |
-    | `Destination host unreachable` | Kas IP ja mask on õiged? Kas ping läks Etherneti, mitte Wi-Fi kaudu? Lülita Wi-Fi korraks välja. |
-    | Tabelis on ainult üks arvuti | Kas pordi tuli põleb? Proovi teist kaablit. |
-
-💭 **Mõtle:** Kuidas sa ilma kaablit jälgimata tead, milline rida tabelis on PC-A?
-
-### Samm 5: ARP — kuidas PC-A sai teada PC-B MAC-i?
-
-PC-A teadis ainult PC-B **IP-aadressi** (192.168.1.20). Kaadri saatmiseks on aga vaja **MAC-aadressi**. Selle küsis PC-A enne pingi ise, **ARP**-iga ([peatükk 5: ARP](../teooria/05_arp.md#kuidas-arp-tootab)).
-
-PC-A-s cmd **administraatorina**: tühjenda ARP-tabel, tee ping ja vaata tabelit.
-
-```text
-arp -d *
-ping 192.168.1.20
-arp -a
-```
-
-Leia väljundist rida `192.168.1.20`. Selle kõrval on PC-B MAC ja tüüp `dynamic` ([ARP-tabel](../teooria/05_arp.md#arp-tabel-telefoniraamat)).
-
-| Kust | PC-B MAC |
-|---|---|
-| PC-B `ipconfig /all` (tabel 6b.1) | |
-| PC-A `arp -a` | |
-| Kommutaatori tabel, port 2 | |
-
-*Tabel 6b.4. Sama MAC kolmes kohas*
-
-💭 **Mõtle:** ARP-päring („kes on 192.168.1.20?“) läheb **kõigile** (broadcast), vastus ainult PC-A-le. Kumb neist õpetas kommutaatorile, kus PC-B on?
-
-### Samm 6: Ping teise võrku
-
-PC-A-st:
-
-```text
-ping 8.8.8.8
-```
-
-Ping ei õnnestu. 8.8.8.8 ei ole sinu võrgus (192.168.1.0/24), seega ARP-iga sealt MAC-i ei küsi: keegi selles kaablis ei vasta. Teise võrku saadab arvuti paketi **ruuterile** ehk **default gateway**'le. Seda meie topoloogias pole, sest kommutaator on 2. kihi seade ja IP-aadresse ei vaata.
-
-💭 **Mõtle:** Mis peaks sinu topoloogiasse lisanduma, et ping 8.8.8.8 töötaks? Vaata [peatükk 6: Ruuter](../teooria/06_vorgukiht.md#ruuter-vorkude-vaheline-teejuht) ja [Default gateway](../teooria/06_vorgukiht.md#default-gateway-uks-valismaailma).
-
-## Osa 4: Kaabli ümberpanek
-
-Vahetage nüüd rolle.
-
-1. Tõmmake PC-B kaabel pordist 2 välja ja pange **porti 5**.
-2. Tehke uuesti ping PC-A-st PC-B-le.
-3. Vaadake tabelit uuesti.
-
-| Küsimus | Vastus |
-|---|---|
-| Mis port on nüüd PC-B MAC-i juures? | |
-| Kas vana rida (port 2) on veel alles? | |
-
-*Tabel 6b.3. Pärast ümberpanekut*
-
-💭 **Mõtle:** Kommutaator ei tea midagi kaablitest. Kust ta sai teada, et PC-B kolis teise porti?
-
-## Osa 5: Mis juhtub, kui keegi ei räägi?
-
-```text
-SW-xx# show mac address-table aging-time
-```
-
-Vaikimisi on see 300 sekundit. Ärge 5 minutit midagi saatke (sulgege brauserid, ärge pingige), seejärel vaadake tabelit uuesti.
-
-💭 **Mõtle:** Miks on kasulik, et kommutaator vanad read ise ära kustutab? Mõtle Osa 4 peale.
-
-## ✅ Lõpukontroll
-
-- [ ] Tabelis 6b.1 on mõlema arvuti MAC ja port ning need klapivad `show mac address-table` väljundiga
-- [ ] Oskad näidata, mis rida tabelis kuulub sinu arvutile, ilma kaablit jälgimata
-- [ ] Pärast kaabli ümberpanekut nägid tabelis uut porti
-- [ ] Oskad öelda, miks Windowsi ja Cisco MAC näevad erinevad välja, kuigi on sama
-
-## Lõpus: korista ära
-
-Järgmine grupp kasutab sama kommutaatorit.
-
-```text
-SW-xx# clear mac address-table dynamic
-```
-
-- Võta oma arvutist staatiline IP maha (**Obtain an IP address automatically**)
-- Kustuta tulemüüri reegel: `netsh advfirewall firewall delete rule name="ICMP lubatud"`
-- Pane kaablid tagasi sinna, kust need võtsid
+1. **Add file → Upload files:** `kaabel.jpg`, `putty.png`, `show-run.png`
+2. Ava `README.md`, vajuta pliiatsit, täida nimi, paariline, kommutaatori number, read `show running-config`-ist ja vasta neljale küsimusele. **Commit changes**.
 
 ## Kokkuvõte
 
-Selles praktikumis sa:
-
-- Ühendusid päris kommutaatoriga konsooli kaudu
-- Leidsid oma arvuti MAC-i Windowsis ja tundsid selle ära Cisco tabelis
-- Nägid, et kommutaator õpib aadressi alles siis, kui arvuti saadab kaadri
-- Nägid, et kaabli ümberpanekul uuendab kommutaator tabelit ise
+- Ühendusid päris kommutaatoriga konsooli kaudu, ilma IP-aadressita
+- Seadistasid nime, paroolid ja bänneri ning kontrollisid neid
+- Tegid kommutaatori järgmise grupi jaoks puhtaks
