@@ -19,7 +19,12 @@ Praktikumis 6 nägid Packet Traceris, kuidas kommutaator MAC-aadresse õpib. Nü
 !!! warning "Eeldused"
     - [Praktikum 6: MAC-aadresside tabel](praktikum_06.md) (Packet Tracer)
     - [Peatükk 4: Andmesidekiht](../teooria/04_andmesidekiht.md)
-    - Konsooliühendus ja PuTTY (Serial, 9600) — kui pole seda veel teinud, õpetaja näitab esimesel grupil ette
+    - Konsooliühendus ja PuTTY (Serial, 9600): vaata enne [videot PuTTY ühendusest](https://drive.google.com/file/d/1y2phgdB0MZ0k9rTrmo_ES2ae5jxHEo1a/view?usp=sharing) ja [juhendit: klassi arvuti, konsoolikaabel, PuTTY](https://docs.google.com/document/d/12NH_-liylELLgUhspfoTXxHba21JFe0_eW3Jok0Zffk/edit?usp=sharing)
+
+!!! info "Mis kihil see on?"
+    Kommutaator on **2. kihi** (andmesidekiht, *Data Link*) seade: ta loeb kaadrist **MAC-aadressi** ja saadab kaadri õigesse porti. IP-aadressi ta ei vaata. IP-aadressidega töötab **ruuter**, mis on **3. kihi** (võrgukiht, *Network*) seade ja ühendab erinevaid võrke. Täna on PC-A ja PC-B samas võrgus (192.168.1.0/24), seega ruuterit pole vaja: kommutaatorist piisab.
+
+    Loe juurde: [OSI mudel, tabel 1.2](../teooria/01_protokollid_mudelid.md#osi-mudel), [Kommutaator — „tark postkontor“](../teooria/04_andmesidekiht.md#kommutaator-tark-postkontor), [Ruuter](../teooria/06_vorgukiht.md#ruuter-vorkude-vaheline-teejuht).
 
 !!! info "Vajalikud materjalid (ühe grupi kohta)"
     - 1× Cisco kommutaator serveriruumis (number on valgel kleebisel)
@@ -57,7 +62,7 @@ Praktikumis 6 nägid Packet Traceris, kuidas kommutaator MAC-aadresse õpib. Nü
 ### Samm 1: Logi sisse
 
 1. Ühenda konsoolikaabel kommutaatori **CONSOLE** porti.
-2. PuTTY: **Serial**, kiirus **9600**, COM-port vaata Device Managerist.
+2. PuTTY: **Serial**, kiirus **9600**, COM-port vaata Device Managerist. Kuidas täpselt: [video](https://drive.google.com/file/d/1y2phgdB0MZ0k9rTrmo_ES2ae5jxHEo1a/view?usp=sharing), [juhend](https://docs.google.com/document/d/12NH_-liylELLgUhspfoTXxHba21JFe0_eW3Jok0Zffk/edit?usp=sharing).
 3. Vajuta Enter, kuni näed viipa `SW-xx>`.
 
 ```text
