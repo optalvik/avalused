@@ -15,6 +15,7 @@ Praktikumis 6 nägid Packet Traceris, kuidas kommutaator MAC-aadresse õpib. Nü
     - Oskan leida arvuti MAC-aadressi Windowsis (`ipconfig /all`)
     - Oskan lugeda päris kommutaatori MAC-tabelit ja seostada iga rea konkreetse kaabli ja arvutiga
     - Oskan selgitada, miks MAC-tabel täitub alles siis, kui arvutid midagi saadavad
+    - Oskan näidata `arp -a` abil, kuidas arvuti leiab IP-aadressi järgi MAC-aadressi
 
 !!! warning "Eeldused"
     - [Praktikum 6: MAC-aadresside tabel](praktikum_06.md) (Packet Tracer)
@@ -178,6 +179,42 @@ Täida nüüd tabelis 6b.1 veerg **Kommutaatori port**.
     | Tabelis on ainult üks arvuti | Kas pordi tuli põleb? Proovi teist kaablit. |
 
 💭 **Mõtle:** Kuidas sa ilma kaablit jälgimata tead, milline rida tabelis on PC-A?
+
+### Samm 5: ARP — kuidas PC-A sai teada PC-B MAC-i?
+
+PC-A teadis ainult PC-B **IP-aadressi** (192.168.1.20). Kaadri saatmiseks on aga vaja **MAC-aadressi**. Selle küsis PC-A enne pingi ise, **ARP**-iga ([peatükk 5: ARP](../teooria/05_arp.md#kuidas-arp-tootab)).
+
+PC-A-s cmd **administraatorina**: tühjenda ARP-tabel, tee ping ja vaata tabelit.
+
+```text
+arp -d *
+ping 192.168.1.20
+arp -a
+```
+
+Leia väljundist rida `192.168.1.20`. Selle kõrval on PC-B MAC ja tüüp `dynamic` ([ARP-tabel](../teooria/05_arp.md#arp-tabel-telefoniraamat)).
+
+| Kust | PC-B MAC |
+|---|---|
+| PC-B `ipconfig /all` (tabel 6b.1) | |
+| PC-A `arp -a` | |
+| Kommutaatori tabel, port 2 | |
+
+*Tabel 6b.4. Sama MAC kolmes kohas*
+
+💭 **Mõtle:** ARP-päring („kes on 192.168.1.20?“) läheb **kõigile** (broadcast), vastus ainult PC-A-le. Kumb neist õpetas kommutaatorile, kus PC-B on?
+
+### Samm 6: Ping teise võrku
+
+PC-A-st:
+
+```text
+ping 8.8.8.8
+```
+
+Ping ei õnnestu. 8.8.8.8 ei ole sinu võrgus (192.168.1.0/24), seega ARP-iga sealt MAC-i ei küsi: keegi selles kaablis ei vasta. Teise võrku saadab arvuti paketi **ruuterile** ehk **default gateway**'le. Seda meie topoloogias pole, sest kommutaator on 2. kihi seade ja IP-aadresse ei vaata.
+
+💭 **Mõtle:** Mis peaks sinu topoloogiasse lisanduma, et ping 8.8.8.8 töötaks? Vaata [peatükk 6: Ruuter](../teooria/06_vorgukiht.md#ruuter-vorkude-vaheline-teejuht) ja [Default gateway](../teooria/06_vorgukiht.md#default-gateway-uks-valismaailma).
 
 ## Osa 4: Kaabli ümberpanek
 
