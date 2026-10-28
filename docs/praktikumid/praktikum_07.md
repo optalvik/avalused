@@ -17,14 +17,14 @@ Ruuter on [võrgukihi](../teooria/06_vorgukiht.md) (Layer 3) seade, mis suunab I
     - Oskan uurida ruuteri riistvara infot (`show version`)
     - Oskan konfigureerida ruuteri liideste IP-aadressid ja kirjeldused
     - Oskan lugeda `show ip interface brief` ja `show ip route` väljundit
-    - Oskan testida ruuteri liideste tööd `ping` käsuga
+    - Oskan seadistada arvutile default gateway'i ja pingida läbi ruuteri teise võrku
 
 !!! warning "Eeldused"
     Enne seda praktikumi pead tundma CLI põhitööd [Praktikumist 2](praktikum_02.md) ja olema läbi lugenud [Peatükk 6: Võrgukiht](../teooria/06_vorgukiht.md) ning [võrguseadmete peatüki](../teooria/00a_vorguseadmed.md).
 
 !!! info "Vajalikud materjalid"
     - Cisco Packet Tracer (või füüsiline ruuter + konsoolikaabel)
-    - Seadmed: 1× ruuter (Cisco 2811 või 4321)
+    - Seadmed: 1× ruuter Cisco 2811 (R1), 2× kommutaator Cisco 2960 (SW1, SW2), 2× PC (PC1, PC2)
 
 ## Osa 1: Ruuter vs kommutaator
 
@@ -39,11 +39,45 @@ Ruuter on [võrgukihi](../teooria/06_vorgukiht.md) (Layer 3) seade, mis suunab I
 *Tabel 7.1. Kommutaatori ja ruuteri võrdlus*
 
 !!! info "Oluline erinevus"
-    Ruuteri liidesed on vaikimisi **välja lülitatud** — turvakaalutlustel. Iga liides tuleb käsitsi aktiveerida käsuga `no shutdown`.
+    Ruuteri liidesed on vaikimisi **välja lülitatud** turvakaalutlustel. Iga liides tuleb käsitsi aktiveerida käsuga `no shutdown`.
 
 ## Osa 2: Ruuteri uurimine
 
-### Samm 1: Ühendamine ja riistvara info
+### Samm 1: Topoloogia
+
+Ruuteri liides läheb olekusse `up` ainult siis, kui kaabli teises otsas on töötav seade. Seepärast ehita kohe terve topoloogia: kaks võrku, kummaski kommutaator ja arvuti, ruuter nende vahel.
+
+| Seade | Kust leiad (Packet Tracer) | Nimi |
+|---|---|---|
+| Ruuter **2811** | Network Devices → Routers | R1 |
+| 2 kommutaatorit **2960** | Network Devices → Switches | SW1, SW2 |
+| 2 arvutit **PC** | End Devices | PC1, PC2 |
+
+*Tabel 7.2. Praktikumi seadmed*
+
+```text
+PC1 ──── SW1 ──── R1 ──── SW2 ──── PC2
+            Fa0/0    Fa0/1
+```
+
+Ühenda seadmed kaabliga **Copper Straight-Through**:
+
+| Kust | Kuhu |
+|---|---|
+| PC1 FastEthernet0 | SW1 Fa0/1 |
+| SW1 Fa0/24 | R1 **Fa0/0** |
+| R1 **Fa0/1** | SW2 Fa0/24 |
+| SW2 Fa0/1 | PC2 FastEthernet0 |
+
+*Tabel 7.3. Kaabeldus*
+
+!!! success "Oodatav tulemus"
+    Kommutaatori ja arvutite vahel lähevad tuled kuni 30 sekundiga roheliseks. Ruuteri juures on tuled **punased**: ruuteri liidesed on vaikimisi välja lülitatud.
+
+!!! info "Miks just 2811?"
+    Packet Traceri 2811 liidesed on `FastEthernet0/0` ja `FastEthernet0/1`, nagu selles juhendis. Uuematel ruuteritel (4321, 1941) on liidesed `GigabitEthernet0/0/0` või `GigabitEthernet0/0` ja käskudes tuleb liidese nimi vastavalt muuta.
+
+### Samm 2: Ühendamine ja riistvara info
 
 Ühenda ruuteriga (PT: kliki ruuteril → CLI tab; füüsiline: konsoolikaabel + PuTTY).
 
@@ -54,7 +88,7 @@ Router# show version
 
 Märgi üles: ruuteri mudel, IOS versioon, RAM ja Flash maht.
 
-### Samm 2: Liideste loetelu
+### Samm 3: Liideste loetelu
 
 ```text
 Router# show ip interface brief
@@ -66,7 +100,7 @@ FastEthernet0/0        unassigned      YES unset  administratively down down
 FastEthernet0/1        unassigned      YES unset  administratively down down
 ```
 
-Kõik liidesed on `unassigned` (IP puudub) ja `administratively down` (välja lülitatud).
+Kõik liidesed on `unassigned` (IP puudub) ja `administratively down` (välja lülitatud). 2811 näitab Packet Traceris lisaks rida `Vlan1`, mida selles praktikumis ei kasuta.
 
 ## Osa 3: Ruuteri konfigureerimine
 
@@ -135,7 +169,7 @@ FastEthernet0/0        192.168.1.1     YES manual up        up
 FastEthernet0/1        192.168.2.1     YES manual up        up
 ```
 
-Mõlemad liidesed peavad olema **up/up**.
+Mõlemad liidesed peavad olema **up/up**. Esimene `up` tähendab, et kaabel on ühendatud ja teises otsas on töötav seade (siin kommutaator). Teine `up` tähendab, et liides saab andmeid vahetada.
 
 ### Marsruutimistabel
 
@@ -145,12 +179,12 @@ R1# show ip route
 
 ```text
 C    192.168.1.0/24 is directly connected, FastEthernet0/0
-L    192.168.1.1/32 is directly connected, FastEthernet0/0
 C    192.168.2.0/24 is directly connected, FastEthernet0/1
-L    192.168.2.1/32 is directly connected, FastEthernet0/1
 ```
 
-**C** = *Connected* — otseühendatud võrk. Ruuter teab automaatselt, millised võrgud on tema liideste taga. **L** = *Local* — liidese enda IP-aadress (/32 mask). Marsruutimistabeli lugemist käsitleb põhjalikumalt [Peatükk 12: Marsruutimine](../teooria/12_marsruutimine.md).
+**C** = *Connected*: otseühendatud võrk. Ruuter teab automaatselt, millised võrgud on tema liideste taga. Sa ei lisanud ühtegi marsruuti: ruuter õppis need ise, kui liidesed said aadressi ja läksid olekusse `up`.
+
+Packet Traceri 2811 kasutab IOS 12.4 ja näitab ainult `C`-ridu. Uuemad ruuterid (IOS 15, nt 4321 või 1941) näitavad iga `C`-rea all ka `L`-rida (*Local*): liidese enda IP-aadress /32 maskiga, nt `L 192.168.1.1/32`. Marsruutimistabeli lugemist käsitleb põhjalikumalt [Peatükk 12: Marsruutimine](../teooria/12_marsruutimine.md).
 
 ### Ping test
 
@@ -161,6 +195,70 @@ R1# ping 192.168.2.1
 
 Mõlemad peavad vastama (`!!!!!` = 5 edukat pingi).
 
+### Arvutite seadistamine ja ping teise võrku
+
+Ruuter töötab. Nüüd anna arvutitele aadressid. Kliki PC-l → **Desktop** → **IP Configuration** → **Static**:
+
+| | PC1 | PC2 |
+|---|---|---|
+| IPv4 Address | 192.168.1.10 | 192.168.2.10 |
+| Subnet Mask | 255.255.255.0 | 255.255.255.0 |
+| Default Gateway | 192.168.1.1 | 192.168.2.1 |
+
+*Tabel 7.4. Arvutite IP-seaded*
+
+Iga arvuti [default gateway](../teooria/06_vorgukiht.md) on ruuteri liides **tema enda võrgus**. Sama ruuter, kaks ust.
+
+PC1 → Desktop → **Command Prompt**:
+
+```text
+C:\> ping 192.168.1.1
+C:\> ping 192.168.2.1
+C:\> ping 192.168.2.10
+```
+
+!!! success "Oodatav tulemus"
+    Kõik kolm pingi õnnestuvad. Viimase väljund on umbes selline:
+
+    ```text
+    Pinging 192.168.2.10 with 32 bytes of data:
+
+    Request timed out.
+    Reply from 192.168.2.10: bytes=32 time<1ms TTL=127
+    Reply from 192.168.2.10: bytes=32 time<1ms TTL=127
+    Reply from 192.168.2.10: bytes=32 time<1ms TTL=127
+    ```
+
+    Esimene `Request timed out` on normaalne: ruuter otsib ARP-iga alles PC2 MAC-aadressi. `TTL=127` (arvuti alustab 128-st) näitab, et pakett läbis ühe ruuteri.
+
+Vaata, kuidas pakett liikus:
+
+```text
+C:\> tracert 192.168.2.10
+```
+
+```text
+Tracing route to 192.168.2.10 over 30 hops:
+
+  1   0 ms      0 ms      0 ms      192.168.1.1
+  2   0 ms      0 ms      0 ms      192.168.2.10
+
+Trace complete.
+```
+
+Kaks hüpet: esimene on PC1 gateway (R1), teine on sihtkoht PC2.
+
+### Lõhu meelega: gateway puudub
+
+1. PC2 → IP Configuration → kustuta **Default Gateway**.
+2. Ennusta: kas PC1-st `ping 192.168.2.10` töötab? PC1 seaded on ju õiged.
+3. Pingi PC1-st PC2-e.
+
+!!! success "Oodatav tulemus"
+    Kõik neli pingi annavad `Request timed out`. Päring jõuab PC2-ni, aga vastus ei leia teed tagasi: PC2 ei tea, kuhu saata pakett võrku 192.168.1.0/24. Ping vajab gateway't **mõlemas** otsas.
+
+Pane PC2 gateway tagasi (`192.168.2.1`) ja kontrolli, et ping töötab jälle.
+
 ## Osa 5: Tõrkeotsing
 
 !!! warning "Liides jääb down?"
@@ -168,9 +266,10 @@ Mõlemad peavad vastama (`!!!!!` = 5 edukat pingi).
     - `down/down` (ilma "administratively") → kaabel pole ühendatud või port on rikki
 
 !!! warning "Ping ei tööta?"
-    1. Kontrolli IP-aadresse: `show ip interface brief`
-    2. Kontrolli marsruutimistabelit: `show ip route`
-    3. Kas salvestasid? `show running-config` vs `show startup-config`
+    1. Ping ruuterile töötab, teise võrgu arvutile mitte → kontrolli **mõlema** arvuti Default Gateway'd (`ipconfig`)
+    2. Kontrolli IP-aadresse: `show ip interface brief`
+    3. Kontrolli marsruutimistabelit: `show ip route`
+    4. Kas salvestasid? `show running-config` vs `show startup-config`
 
 ---
 
@@ -184,3 +283,5 @@ Selles praktikumis sa:
 - Aktiveerisid liidesed `no shutdown` käsuga
 - Kontrollisid liideste staatust ja marsruutimistabelit
 - Testisid liideste tööd `ping` käsuga
+- Seadistasid arvutitele default gateway'i ja pingisid läbi ruuteri teise võrku
+- Nägid, et ilma gateway'ta ei jõua vastus tagasi
