@@ -92,7 +92,7 @@ Praktiline osa koosneb 11 laborist, mis kasutavad Cisco Packet Tracerit ja serve
 
     ---
 
-    Kinnista oskusi — ehita ja konfigureeri ilma juhisteta.
+    Kinnista oskusi: ehita ja seadista ilma juhisteta.
 
     [:octicons-arrow-right-24: Alusta](praktikum_09.md)
 
