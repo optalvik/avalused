@@ -6,33 +6,33 @@ tags:
 
 # Praktikum 9: Staatiline marsruutimine (iseseisev harjutus)
 
-See praktikum kinnistab [Praktikumis 8](praktikum_08.md) õpitut — ehitad sama tüüpi topoloogia nullist ja ilma detailsete juhisteta. Eesmärk on kontrollida, kas suudad staatilise marsruutimise seadistada iseseisvalt.
+See praktikum kinnistab [Praktikumis 8](praktikum_08.md) õpitut. Ehitad sama tüüpi topoloogia nullist, aga teiste ruuterite ja aadressidega. Käske juhend ette ei anna: iga ülesande juures on kokkuvolditud vihje, mida ava ainult siis, kui jääd kinni.
 
 Teooria kordamiseks: [Peatükk 12: Marsruutimine](../teooria/12_marsruutimine.md), [Peatükk 8: IPv4](../teooria/08_ipv4.md), [Peatükk 10: Alamvõrgustamine](../teooria/10_alamvorgustamine.md).
 
 !!! abstract "Eesmärgid"
     Selle praktikumi läbimise järel:
 
-    - Oskan iseseisvalt planeerida IP-aadressid mitmele võrgule
-    - Oskan ilma juhisteta konfigureerida staatilisi marsruute käsuga `ip route`
-    - Oskan kasutada /30 maski punkt-punkt ühendustes
-    - Oskan testida ja kontrollida marsruutimist `show ip route` ja `ping` abil
-    - Oskan selgitada staatilise marsruutimise eeliseid ja puudusi
+    - Oskan ilma juhisteta seadistada kahe ruuteri liidesed ja staatilised marsruudid
+    - Oskan kasutada /30 maski ruuterite vahelises lingis
+    - Oskan lugeda IOS 15 marsruutimistabelit, kus on ka `L`-read
+    - Oskan kontrollida marsruutimist käskudega `show ip route` ja `ping`
 
 ## Topoloogia
 
 ```text
-[PC0]--[PC1]--[SW0]--[R0]---link---[R1]--[SW1]--[PC2]--[PC3]
-                     G0/1  G0/0  G0/0  G0/1
-              LAN 1              Link              LAN 2
-         192.168.70.0/24   221.123.1.0/30   172.230.10.0/24
+PC0 ─┐                                         ┌─ PC2
+     ├── SW0 ──── R0 ─────────── R1 ──── SW1 ──┤
+PC1 ─┘      G0/1    G0/0   G0/0    G0/1        └─ PC3
+      LAN 1              link              LAN 2
+192.168.70.0/24    221.123.1.0/30    172.230.10.0/24
 ```
 
 | Seade | Liides | Võrk | IP-aadress | Mask |
 |---|---|---|---|---|
-| R0 | G0/0 | Link | 221.123.1.1 | 255.255.255.252 |
+| R0 | G0/0 | link | 221.123.1.1 | 255.255.255.252 |
 | R0 | G0/1 | LAN 1 | 192.168.70.1 | 255.255.255.0 |
-| R1 | G0/0 | Link | 221.123.1.2 | 255.255.255.252 |
+| R1 | G0/0 | link | 221.123.1.2 | 255.255.255.252 |
 | R1 | G0/1 | LAN 2 | 172.230.10.1 | 255.255.255.0 |
 | PC0 | NIC | LAN 1 | 192.168.70.2 | 255.255.255.0 |
 | PC1 | NIC | LAN 1 | 192.168.70.3 | 255.255.255.0 |
@@ -41,162 +41,61 @@ Teooria kordamiseks: [Peatükk 12: Marsruutimine](../teooria/12_marsruutimine.md
 
 *Tabel 9.1. IP-aadresside plaan*
 
-!!! info "/30 mask link-võrgus"
-    Ruuterite vaheline ühendus vajab ainult 2 IP-aadressi. /30 mask annab täpselt 2 kasutatavat aadressi — aadressiruumi optimaalne kasutus. Vt [Peatükk 10: Alamvõrgustamine](../teooria/10_alamvorgustamine.md).
+## Osa 1: Topoloogia
 
-## Osa 1: Topoloogia loomine
+Lisa seadmed: 2 ruuterit **2911** (R0, R1), 2 kommutaatorit 2960 (SW0, SW1) ja 4 arvutit (PC0–PC3).
 
-### Samm 1: Lisa seadmed
+| Ühendus | Port A | Port B | Kaabel |
+|---|---|---|---|
+| R0 ↔ R1 | G0/0 | G0/0 | Copper Cross-Over |
+| R0 ↔ SW0 | G0/1 | Gig0/1 | Copper Straight-Through |
+| R1 ↔ SW1 | G0/1 | Gig0/1 | Copper Straight-Through |
+| PC0 ↔ SW0 | Fa0 | Fa0/1 | Copper Straight-Through |
+| PC1 ↔ SW0 | Fa0 | Fa0/2 | Copper Straight-Through |
+| PC2 ↔ SW1 | Fa0 | Fa0/1 | Copper Straight-Through |
+| PC3 ↔ SW1 | Fa0 | Fa0/2 | Copper Straight-Through |
 
-- 2× Router 2911 (R0, R1)
-- 2× Switch 2960 (SW0, SW1)
-- 4× PC (PC0–PC3)
+*Tabel 9.2. Kaabeldus*
 
-### Samm 2: Kaabeldamine
+Seadista arvutitele aadressid tabeli 9.1 järgi. LAN 1 arvutite gateway on `192.168.70.1`, LAN 2 arvutite gateway `172.230.10.1`.
 
-| Ühendus | Port A | Port B |
-|---|---|---|
-| R0 ↔ R1 | G0/0 | G0/0 |
-| R0 ↔ SW0 | G0/1 | G0/1 |
-| R1 ↔ SW1 | G0/1 | G0/1 |
-| PC0 ↔ SW0 | Fa0 | Fa0/1 |
-| PC1 ↔ SW0 | Fa0 | Fa0/2 |
-| PC2 ↔ SW1 | Fa0 | Fa0/1 |
-| PC3 ↔ SW1 | Fa0 | Fa0/2 |
+## Osa 2: Ruuterite liidesed
 
-*Tabel 9.2. Kaabeldamise plaan*
+**Ülesanne:** anna mõlemale ruuterile hostinimi ja seadista liidesed tabeli 9.1 järgi.
 
-### Samm 3: Seadista PC-de IP-aadressid
+**Kontrolli:** `show ip interface brief` näitab mõlemal ruuteril kahte liidest olekus `up up`. PC0-st `ping 192.168.70.3` ja PC2-st `ping 172.230.10.3` õnnestuvad.
 
-PC0–PC1: gateway **192.168.70.1**
+??? tip "Vihje: liidese seadistamine"
+    ```text
+    R0(config)# interface gigabitethernet 0/0
+    R0(config-if)# ip address 221.123.1.1 255.255.255.252
+    R0(config-if)# no shutdown
+    ```
 
-PC2–PC3: gateway **172.230.10.1**
+    Teise liidese ja R1 liidesed seadista samamoodi.
 
-## Osa 2: Ruuterite konfigureerimine
+## Osa 3: Staatilised marsruudid
 
-### R0
+**Ülesanne:** lisa kummalegi ruuterile staatiline marsruut teise ruuteri taga olevasse LAN-i.
 
-```text
-Router> enable
-Router# configure terminal
-Router(config)# hostname R0
-R0(config)# interface GigabitEthernet0/0
-R0(config-if)# ip address 221.123.1.1 255.255.255.252
-R0(config-if)# no shutdown
-R0(config-if)# exit
-R0(config)# interface GigabitEthernet0/1
-R0(config-if)# ip address 192.168.70.1 255.255.255.0
-R0(config-if)# no shutdown
-R0(config-if)# exit
-```
+**Kontrolli:** R0 tabelis on `S`-rida võrgu `172.230.10.0` jaoks (`via 221.123.1.2`) ja R1 tabelis `S`-rida võrgu `192.168.70.0` jaoks (`via 221.123.1.1`).
 
-### R1
+??? tip "Vihje: käsu kuju"
+    `ip route <sihtvõrk> <mask> <naaberruuteri aadress lingis>`, globaalses konfiguratsioonirežiimis. Vaata [Praktikum 8, Osa 3](praktikum_08.md#osa-3-staatilised-marsruudid).
 
-```text
-Router> enable
-Router# configure terminal
-Router(config)# hostname R1
-R1(config)# interface GigabitEthernet0/0
-R1(config-if)# ip address 221.123.1.2 255.255.255.252
-R1(config-if)# no shutdown
-R1(config-if)# exit
-R1(config)# interface GigabitEthernet0/1
-R1(config-if)# ip address 172.230.10.1 255.255.255.0
-R1(config-if)# no shutdown
-R1(config-if)# exit
-```
+!!! info "IOS 15 marsruutimistabel"
+    Ruuter 2911 kasutab IOS 15. Erinevalt praktikumi 8 ruuterist 2811 on iga `C`-rea all ka `L`-rida (*Local*): liidese enda aadress maskiga /32, näiteks `L 192.168.70.1/32 is directly connected, GigabitEthernet0/1`. Tabelis on ka rühmade pealkirjad (`is subnetted`, `is variably subnetted`), mis näitavad, mitu alamvõrku ja maski on ühe klassipõhise võrgu sees.
 
-## Osa 3: Lokaalne test
+## Osa 4: Lõpptest
 
-Enne marsruutimise lisamist testi LAN-ide sisest ühenduvust:
+**Kontrolli:** PC0-st `ping 172.230.10.2` ja PC2-st `ping 192.168.70.2` õnnestuvad. PC0-st `tracert 172.230.10.2` näitab kolme hüpet.
 
-PC0 → PC1:
+Salvesta mõlema ruuteri konfiguratsioon (`copy running-config startup-config`).
 
-```bash
-ping 192.168.70.3
-```
-
-PC2 → PC3:
-
-```bash
-ping 172.230.10.3
-```
-
-Mõlemad peavad töötama — see kinnitab, et Layer 2 (kommutaator) ja IP-seadistused on korras.
-
-## Osa 4: Staatiliste marsruutide lisamine
-
-Praegu teab R0 ainult oma otseühendatud võrke (192.168.70.0 ja 221.123.1.0). Ta **ei tea**, kuidas jõuda 172.230.10.0 võrku. Sama R1 puhul — ta ei tea 192.168.70.0 kohta.
-
-### R0 — marsruut LAN 2 suunas
-
-```text
-R0(config)# ip route 172.230.10.0 255.255.255.0 221.123.1.2
-```
-
-See ütleb: "Kui tahad jõuda 172.230.10.0/24 võrku, saada pakett next-hop aadressile 221.123.1.2 (R1)."
-
-### R1 — marsruut LAN 1 suunas
-
-```text
-R1(config)# ip route 192.168.70.0 255.255.255.0 221.123.1.1
-```
-
-### Salvesta mõlemal
-
-```text
-R0# copy running-config startup-config
-R1# copy running-config startup-config
-```
-
-## Osa 5: Marsruutimistabeli kontrollimine
-
-### R0
-
-```text
-R0# show ip route
-```
-
-```text
-C    192.168.70.0/24 is directly connected, GigabitEthernet0/1
-C    221.123.1.0/30 is directly connected, GigabitEthernet0/0
-S    172.230.10.0/24 [1/0] via 221.123.1.2
-```
-
-**C** = Connected (otse ühendatud), **S** = Static (käsitsi lisatud).
-
-### R1
-
-```text
-R1# show ip route
-```
-
-```text
-C    172.230.10.0/24 is directly connected, GigabitEthernet0/1
-C    221.123.1.0/30 is directly connected, GigabitEthernet0/0
-S    192.168.70.0/24 [1/0] via 221.123.1.1
-```
-
-## Osa 6: Lõpptest
-
-PC0 → PC2 (LAN 1 → LAN 2):
-
-```bash
-ping 172.230.10.2
-```
-
-PC2 → PC0 (LAN 2 → LAN 1):
-
-```bash
-ping 192.168.70.2
-```
-
-Mõlemad peavad töötama — paketid liiguvad R0 → link → R1 ja tagasi.
-
-!!! danger "Ping ei tööta?"
-    1. Kas mõlemal ruuteril on staatiline marsruut? (mõlemal suunal!)
-    2. Kas PC-de default gateway on ruuteri LAN-liidese IP?
-    3. Kas kõik liidested on up/up? (`show ip interface brief`)
+??? warning "Ping ei õnnestu"
+    1. Kas `ping 221.123.1.2` R0-st õnnestub? Kui ei, on link maas: kontrolli kaablit ja `show ip interface brief`.
+    2. Kas marsruut on olemas **mõlemal** ruuteril ja next-hop on naaberruuteri aadress?
+    3. Kas arvutite gateway on nende enda LAN-i ruuteri liides?
 
 ---
 
@@ -204,8 +103,8 @@ Mõlemad peavad töötama — paketid liiguvad R0 → link → R1 ja tagasi.
 
 Selles praktikumis sa:
 
-- Planeerisid IP-aadressid kolmele võrgule (2 LAN + 1 link)
-- Kasutasid /30 maski punkt-punkt ühenduses
-- Konfigureerrisid staatilised marsruudid käsuga `ip route`
-- Kontrollisid marsruutimistabelit (`show ip route`)
-- Testisid LAN-idevahelist ühenduvust läbi kahe ruuteri
+- Ehitasid kahe ruuteri ja kahe kohtvõrguga topoloogia ilma juhisteta
+- Kasutasid /30 maski ruuterite vahelises lingis
+- Seadistasid staatilised marsruudid mõlemal ruuteril
+- Lugesid IOS 15 marsruutimistabelit koos `L`-ridadega
+- Testisid ühendust kahe kohtvõrgu vahel
