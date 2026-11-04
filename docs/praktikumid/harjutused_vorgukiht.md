@@ -6,7 +6,7 @@ tags:
 
 # Tahvliharjutused: IPv4-aadress, võrk ja default gateway
 
-Need harjutused kordavad [praktikumi 7](praktikum_07.md) ja [peatüki 6: Võrgukiht](../teooria/06_vorgukiht.md) ning [peatüki 8: IPv4 adresseerimine](../teooria/08_ipv4.md) teemasid: IPv4-aadressi ülesehitus, võrk, ruuter ja default gateway. Osad 1–5 on **individuaalsed**: iga õppija lahendab tahvlil ühe ülesande, järgmine jätkab või parandab ja klass kontrollib. Osad 6–7 on **rühmatööd**. Vastused on kokkuvolditud plokkides. Ava need alles pärast seda, kui tahvlil on lahendus olemas.
+Osa 1 kordab [praktikumi 7](praktikum_07.md) ja [peatüki 6: Võrgukiht](../teooria/06_vorgukiht.md) teemasid: ruuter ja default gateway. Osad 2–7 on uue teema [IPv4 adresseerimine](../teooria/08_ipv4.md) harjutused: IPv4-aadressi ülesehitus, võrk ja aadressid samas võrgus. Iga osa eel selgitab õpetaja teooria lühidalt. Osad 1–5 on **individuaalsed**: iga õppija lahendab tahvlil ühe ülesande, järgmine jätkab või parandab ja klass kontrollib. Osad 6–7 on **rühmatööd**. Vastused on kokkuvolditud plokkides. Ava need alles pärast seda, kui tahvlil on lahendus olemas.
 
 !!! abstract "Eesmärgid"
     Harjutuste lõpuks:
